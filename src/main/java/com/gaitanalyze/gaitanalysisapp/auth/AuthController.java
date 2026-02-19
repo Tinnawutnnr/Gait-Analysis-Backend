@@ -2,6 +2,7 @@ package com.gaitanalyze.gaitanalysisapp.auth;
 
 import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
 import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerService;
+import com.gaitanalyze.gaitanalysisapp.dto.AuthResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,14 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private CaretakerService caretakerService;
+    private AuthService authService;
 
-    public AuthController(CaretakerService caretakerService) {
-        this.caretakerService = caretakerService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCaretaker(@Valid @RequestBody Caretaker caretakerReq){
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody Caretaker request){
+        AuthResponse response = authService.register(request);
+        return ResponseEntity.ok(response);
+    }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request){
+        AuthResponse response = authService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(response);
     }
 }

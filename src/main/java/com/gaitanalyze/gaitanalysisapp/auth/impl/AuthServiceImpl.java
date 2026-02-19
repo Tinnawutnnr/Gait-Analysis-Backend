@@ -61,6 +61,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String createRefreshToken(Caretaker caretaker){
+
+        var existingToken = refreshTokenRepo.findByCaretaker(caretaker);
+
+        existingToken.ifPresent(refreshToken -> refreshTokenRepo.delete(refreshToken));
+
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setCaretaker(caretaker);
         refreshToken.setToken(UUID.randomUUID().toString());
