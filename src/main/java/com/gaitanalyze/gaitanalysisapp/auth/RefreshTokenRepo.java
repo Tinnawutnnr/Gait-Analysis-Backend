@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByCaretaker(Caretaker caretaker);
+    Optional<RefreshToken> findByToken(String token);
 }

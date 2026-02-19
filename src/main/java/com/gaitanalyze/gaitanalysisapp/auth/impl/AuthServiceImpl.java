@@ -7,6 +7,7 @@ import com.gaitanalyze.gaitanalysisapp.auth.RefreshTokenRepo;
 import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
 import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerRepository;
 import com.gaitanalyze.gaitanalysisapp.dto.AuthResponse;
+import com.gaitanalyze.gaitanalysisapp.dto.RefreshTokenRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,6 +60,26 @@ public class AuthServiceImpl implements AuthService {
 
         return new AuthResponse(jwtToken, refreshToken);
     }
+
+    @Override
+    public AuthResponse refreshToken(RefreshTokenRequest request) {
+
+        String requestToken = request.getRefreshToken();
+
+        RefreshToken refreshToken = refreshTokenRepo.findByToken(requestToken)
+                .orElseThrow(()->new IllegalArgumentException("Refresh token not found."));
+
+        if(refreshToken.getExpiryDate().compareTo(Instant.now()) < 0){
+            refreshTokenRepo.delete(refreshToken);
+            throw new IllegalArgumentException("Refresh token expired. Please login again.");
+        }
+
+        Caretaker caretaker = refreshToken.getCaretaker();
+        String newJwtToken = jwtService.generateToken(caretaker.getEmail());
+
+        return new AuthResponse(newJwtToken, requestToken);
+    }
+
 
     private String createRefreshToken(Caretaker caretaker){
 
