@@ -28,26 +28,12 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmail(String token){
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public boolean isTokenExpired(String token){
-        return extractExpiration(token).before(new Date());
-    }
-
-    public boolean isTokenValid(String token, String userEmail){
-        final String tokenEmail = extractEmail(token);
-        return (tokenEmail.equals(userEmail)) && !isTokenExpired(token);
-    }
-
-    //helper method
     private SecretKey getSignInKey(){
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims getAllClaims(String token){
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
@@ -55,12 +41,19 @@ public class JwtService {
                 .getPayload();
     }
 
-    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    public String extractEmail(String token){
+        Claims claims = getAllClaims(token);
+        return claims.getSubject();
     }
 
-    private Date extractExpiration(String token){
-        return extractClaim(token, Claims::getExpiration);
+    public boolean isTokenExpired(String token){
+        Claims claims = getAllClaims(token);
+        Date expirationDate = claims.getExpiration();
+        return expirationDate.before(new Date());
+    }
+
+    public boolean isTokenValid(String token, String userEmail){
+        String emailInsideToken = extractEmail(token);
+        return (emailInsideToken.equals(userEmail)) && !isTokenExpired(token);
     }
 }
