@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import java.util.Optional;
 
 public interface RefreshTokenRepo extends JpaRepository<RefreshToken, Long> {
+    Optional<RefreshToken> findByCaretaker(Caretaker caretaker);
     Optional<RefreshToken> findByToken(String token);
-    @Modifying
-    int deleteByCaretaker(Caretaker caretaker);
 }
