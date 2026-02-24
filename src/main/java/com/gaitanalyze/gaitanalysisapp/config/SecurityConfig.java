@@ -28,7 +28,9 @@ public class SecurityConfig{
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() //allow this route access without credential
+                        .requestMatchers("/auth/**").permitAll()//allow this route access without credential
+                        .requestMatchers("/patients/**").permitAll()
+                        .requestMatchers("/gait/**").permitAll()
                         .anyRequest().authenticated()//any req other than above permitted must be authenticated
                 )
                 .authenticationProvider(authenticationProvider)
