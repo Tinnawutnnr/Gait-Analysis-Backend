@@ -4,12 +4,8 @@ import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
 import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerRepository;
 import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerService;
 import com.gaitanalyze.gaitanalysisapp.exception.ResourceNotFoundException;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MissingRequestValueException;
 
-import java.util.Optional;
 
 @Service
 public class CaretakerServiceImpl implements CaretakerService {
@@ -18,14 +14,6 @@ public class CaretakerServiceImpl implements CaretakerService {
 
     public CaretakerServiceImpl(CaretakerRepository caretakerRepository) {
         this.caretakerRepository = caretakerRepository;
-    }
-
-    @Override
-    public void createCaretaker(Caretaker caretakerReq) {
-        if(caretakerReq == null){
-            throw new IllegalArgumentException("Request body should not be empty.");
-        }
-        caretakerRepository.save(caretakerReq);
     }
 
     @Override

@@ -14,12 +14,6 @@ public class CaretakerController {
         this.caretakerService = caretakerService;
     }
 
-    @PostMapping("/caretaker")
-    public ResponseEntity<String> createCaretaker(@Valid @RequestBody Caretaker caretakerReq){
-        caretakerService.createCaretaker(caretakerReq);
-        return new ResponseEntity<>("Caretaker created successfully.", HttpStatus.CREATED);
-    }
-
     @GetMapping("/caretaker/{caretakerId}")
     public ResponseEntity<Caretaker> getCaretakerById(@PathVariable Long caretakerId){
         Caretaker caretaker = caretakerService.getCaretakerById(caretakerId);
