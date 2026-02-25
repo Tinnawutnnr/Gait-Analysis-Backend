@@ -21,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Caretaker caretaker = caretakerRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("Email: " + email + "not found."));
+                .orElseThrow(()->new UsernameNotFoundException("Email: " + email + " not found."));
         return new User(
                 caretaker.getEmail(),
                 caretaker.getPassword(),

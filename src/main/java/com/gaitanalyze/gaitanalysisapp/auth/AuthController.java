@@ -1,7 +1,6 @@
 package com.gaitanalyze.gaitanalysisapp.auth;
 
 import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
-import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerService;
 import com.gaitanalyze.gaitanalysisapp.dto.AuthResponse;
 import com.gaitanalyze.gaitanalysisapp.dto.RefreshTokenRequest;
 import jakarta.validation.Valid;
