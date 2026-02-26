@@ -4,10 +4,13 @@ import com.gaitanalyze.gaitanalysisapp.auth.AuthService;
 import com.gaitanalyze.gaitanalysisapp.auth.JwtService;
 import com.gaitanalyze.gaitanalysisapp.auth.RefreshToken;
 import com.gaitanalyze.gaitanalysisapp.auth.RefreshTokenRepo;
-import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
-import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerRepository;
 import com.gaitanalyze.gaitanalysisapp.dto.AuthResponse;
 import com.gaitanalyze.gaitanalysisapp.dto.RefreshTokenRequest;
+import com.gaitanalyze.gaitanalysisapp.exception.ResourceNotFoundException;
+import com.gaitanalyze.gaitanalysisapp.user.User;
+import com.gaitanalyze.gaitanalysisapp.user.UserRepository;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,14 +22,14 @@ import java.util.UUID;
 @Service
 public class AuthServiceImpl implements AuthService {
 
-    private CaretakerRepository caretakerRepository;
+    private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private JwtService jwtService;
     private AuthenticationManager authenticationManager;
     private RefreshTokenRepo refreshTokenRepo;
 
-    public AuthServiceImpl(CaretakerRepository caretakerRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RefreshTokenRepo refreshTokenRepo) {
-        this.caretakerRepository = caretakerRepository;
+    public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, RefreshTokenRepo refreshTokenRepo) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -34,35 +37,35 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse register(Caretaker request) {
+    public AuthResponse register(User request) {
 
         request.setPassword(passwordEncoder.encode(request.getPassword()));
-        Caretaker savedCaretaker = caretakerRepository.save(request);
+        User savedUser = userRepository.save(request);
 
-        String jwtToken = jwtService.generateToken(savedCaretaker.getEmail());
-        String refreshToken = createRefreshToken(savedCaretaker);
+        String jwtToken = jwtService.generateToken(savedUser.getUsername());
+        String refreshToken = String.valueOf(createRefreshToken(savedUser));
 
         return new AuthResponse(jwtToken, refreshToken);
 
     }
 
     @Override
-    public AuthResponse login(String email, String password) {
+    public AuthResponse login(String username, String password) {
         //check password according to given email.
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password)
+                new UsernamePasswordAuthenticationToken(username, password)
         );
-        Caretaker caretaker = caretakerRepository.findByEmail(email).
-                orElseThrow(()->new IllegalArgumentException("Invalid email or password."));
+        User user = userRepository.findByUsername(username).
+                orElseThrow(()->new IllegalArgumentException("Invalid username or password."));
 
-        String jwtToken = jwtService.generateToken(caretaker.getEmail());
-        String refreshToken = createRefreshToken(caretaker);
+        String jwtToken = jwtService.generateToken(user.getUsername());
+        String refreshToken = String.valueOf(createRefreshToken(user));
 
         return new AuthResponse(jwtToken, refreshToken);
     }
 
     @Override
-    public AuthResponse refreshToken(RefreshTokenRequest request) {
+    public AuthResponse refreshToken(@org.checkerframework.checker.nullness.qual.MonotonicNonNull @Valid RefreshTokenRequest request) {
 
         String requestToken = request.getRefreshToken();
 
@@ -74,21 +77,35 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Refresh token expired. Please login again.");
         }
 
-        Caretaker caretaker = refreshToken.getCaretaker();
-        String newJwtToken = jwtService.generateToken(caretaker.getEmail());
+        User user = refreshToken.getUser();
+        String newJwtToken = jwtService.generateToken(user.getUsername());
 
         return new AuthResponse(newJwtToken, requestToken);
     }
 
+    @Override
+    @Transactional
+    public void logout(String reqToken) {
 
-    private String createRefreshToken(Caretaker caretaker){
+        String cleanToken = reqToken.trim();
 
-        var existingToken = refreshTokenRepo.findByCaretaker(caretaker);
+        int deletedRows = refreshTokenRepo.deleteByTokenDirectly(cleanToken);
+
+
+        if (deletedRows == 0) {
+            throw new ResourceNotFoundException("Refresh token not found.");
+        }
+    }
+
+
+    private String createRefreshToken(User user){
+
+        var existingToken = refreshTokenRepo.findByUser(user);
 
         existingToken.ifPresent(refreshToken -> refreshTokenRepo.delete(refreshToken));
 
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setCaretaker(caretaker);
+        refreshToken.setUser(user);
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken.setExpiryDate(Instant.now().plusMillis(604800000));//7days
 

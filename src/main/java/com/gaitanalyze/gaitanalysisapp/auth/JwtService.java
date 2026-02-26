@@ -18,9 +18,9 @@ public class JwtService {
     @Value("${application.security.jwt.expiration:900000}")
     private long jwtExpiration;
 
-    public String generateToken(String email){
+    public String generateToken(String username){
         return Jwts.builder()
-                .subject(email)
+                .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey())
@@ -40,7 +40,7 @@ public class JwtService {
                 .getPayload();
     }
 
-    public String extractEmail(String token){
+    public String extractUsername(String token){
         Claims claims = getAllClaims(token);
         return claims.getSubject();
     }
@@ -51,8 +51,8 @@ public class JwtService {
         return expirationDate.before(new Date());
     }
 
-    public boolean isTokenValid(String token, String userEmail){
-        String emailInsideToken = extractEmail(token);
-        return (emailInsideToken.equals(userEmail)) && !isTokenExpired(token);
+    public boolean isTokenValid(String token, String username){
+        String usernameInsideToken = extractUsername(token);
+        return (usernameInsideToken.equals(username)) && !isTokenExpired(token);
     }
 }

@@ -1,8 +1,7 @@
 package com.gaitanalyze.gaitanalysisapp.auth;
-
-import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
-import com.gaitanalyze.gaitanalysisapp.caretaker.CaretakerRepository;
-import org.springframework.security.core.userdetails.User;
+import com.gaitanalyze.gaitanalysisapp.user.User;
+import com.gaitanalyze.gaitanalysisapp.user.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,20 +11,23 @@ import java.util.Collections;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-    private final CaretakerRepository caretakerRepository;
 
-    public CustomUserDetailsService(CaretakerRepository caretakerRepository) {
-        this.caretakerRepository = caretakerRepository;
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Caretaker caretaker = caretakerRepository.findByEmail(email)
-                .orElseThrow(()->new UsernameNotFoundException("Email: " + email + " not found."));
-        return new User(
-                caretaker.getEmail(),
-                caretaker.getPassword(),
-                Collections.emptyList()
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()->new UsernameNotFoundException("Username: " + username + " not found."));
+
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                Collections.singleton(authority)
         );
     }
 }

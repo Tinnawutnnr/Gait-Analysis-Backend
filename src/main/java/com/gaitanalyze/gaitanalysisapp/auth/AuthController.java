@@ -1,14 +1,14 @@
 package com.gaitanalyze.gaitanalysisapp.auth;
 
-import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
 import com.gaitanalyze.gaitanalysisapp.dto.AuthResponse;
+import com.gaitanalyze.gaitanalysisapp.dto.LoginRequest;
+import com.gaitanalyze.gaitanalysisapp.dto.LogoutRequest;
 import com.gaitanalyze.gaitanalysisapp.dto.RefreshTokenRequest;
+import com.gaitanalyze.gaitanalysisapp.user.User;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -21,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody Caretaker request){
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody User request){
         AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
@@ -36,5 +36,11 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request){
         AuthResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<String> refresh(@Valid @RequestBody LogoutRequest logoutRequest){
+         authService.logout(logoutRequest.getRefreshToken());
+        return new ResponseEntity<>("Logout successfully.", HttpStatus.OK);
     }
 }

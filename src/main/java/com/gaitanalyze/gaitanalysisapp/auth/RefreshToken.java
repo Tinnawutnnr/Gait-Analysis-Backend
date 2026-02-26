@@ -1,7 +1,8 @@
 package com.gaitanalyze.gaitanalysisapp.auth;
 
-import com.gaitanalyze.gaitanalysisapp.caretaker.Caretaker;
+import com.gaitanalyze.gaitanalysisapp.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 
 import java.time.Instant;
 
@@ -18,8 +19,8 @@ public class RefreshToken {
     private Instant expiryDate;
 
     @OneToOne
-    @JoinColumn(name = "caretaker_id", referencedColumnName = "id")
-    private Caretaker caretaker;
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     public RefreshToken() {
     }
@@ -48,11 +49,11 @@ public class RefreshToken {
         this.expiryDate = expiryDate;
     }
 
-    public Caretaker getCaretaker() {
-        return caretaker;
+    public User getUser() {
+        return user;
     }
 
-    public void setCaretaker(Caretaker caretaker) {
-        this.caretaker = caretaker;
+    public void setUser(User user) {
+        this.user = user;
     }
 }
