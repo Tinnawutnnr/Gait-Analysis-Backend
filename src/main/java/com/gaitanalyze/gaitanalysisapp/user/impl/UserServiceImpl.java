@@ -7,6 +7,7 @@ import com.gaitanalyze.gaitanalysisapp.user.Role;
 import com.gaitanalyze.gaitanalysisapp.user.User;
 import com.gaitanalyze.gaitanalysisapp.user.UserRepository;
 import com.gaitanalyze.gaitanalysisapp.user.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deletePatient(String username, Long caretakerId) {
 
         User user = userRepository.findByUsername(username)
@@ -47,6 +49,12 @@ public class UserServiceImpl implements UserService {
 
         if (!isAuthorized) {
             throw new IllegalArgumentException("Access Denied.");
+        }
+
+        int rowDeleted = patientInfoRepo.isUserInfoDeleted(user.getId());
+
+        if(rowDeleted <= 0){
+            throw new ResourceNotFoundException("Patient not found.");
         }
 
         user.setCaretaker_id(null);

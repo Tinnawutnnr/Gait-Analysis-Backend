@@ -1,5 +1,6 @@
 package com.gaitanalyze.gaitanalysisapp.patientInfo.impl;
 
+import com.gaitanalyze.gaitanalysisapp.dto.DeleteInfoReq;
 import com.gaitanalyze.gaitanalysisapp.dto.PatientInfoRequest;
 import com.gaitanalyze.gaitanalysisapp.exception.ResourceNotFoundException;
 import com.gaitanalyze.gaitanalysisapp.patientInfo.PatientInfo;
@@ -42,5 +43,10 @@ public class PatientInfoServiceImpl implements PatientInfoService {
         newInfo.setWeight(request.getWeight());
 
         patientInfoRepo.save(newInfo);
+    }
+
+    @Override
+    public void deleteInfo(DeleteInfoReq request, Long caretakerId) {
+
     }
 }

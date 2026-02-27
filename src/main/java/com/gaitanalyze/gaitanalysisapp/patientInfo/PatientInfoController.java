@@ -1,5 +1,6 @@
 package com.gaitanalyze.gaitanalysisapp.patientInfo;
 
+import com.gaitanalyze.gaitanalysisapp.dto.DeleteInfoReq;
 import com.gaitanalyze.gaitanalysisapp.dto.PatientInfoRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -20,5 +21,12 @@ public class PatientInfoController {
     public ResponseEntity<String> createInfo(@Valid @RequestBody PatientInfoRequest request, @PathVariable Long caretakerId){
         patientInfoService.createInfo(request, caretakerId);
         return new ResponseEntity<>("Info has been created.", HttpStatus.CREATED);
+    }
+
+
+    @DeleteMapping("/{caretakerId}")
+    public ResponseEntity<String> deleteInfo(@Valid @RequestBody DeleteInfoReq request, @PathVariable Long caretakerId){
+        patientInfoService.deleteInfo(request, caretakerId);
+        return new ResponseEntity<>("Info has been deleted.", HttpStatus.OK);
     }
 }

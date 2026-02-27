@@ -19,7 +19,7 @@ public class PatientInfo {
 
     @NotNull(message = "User cannot be null")
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true) // <-- ADD UNIQUE!
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
     public Long getId() {
