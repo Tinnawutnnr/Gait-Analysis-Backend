@@ -11,4 +11,6 @@ public interface PatientInfoRepo extends JpaRepository<PatientInfo, Long> {
     @Modifying
     @Query("DELETE FROM PatientInfo p WHERE p.user.id = :patientId")
     int isUserInfoDeleted(@Param("patientId") Long patientId);
+
+    Optional<PatientInfo> findPatientInfoByUser_Id(Long userId);
 }

@@ -7,5 +7,5 @@ import jakarta.validation.Valid;
 public interface PatientInfoService {
     void createInfo(@Valid PatientInfoRequest request, Long caretakerId);
 
-    void deleteInfo(@Valid DeleteInfoReq request, Long caretakerId);
+    void updateInfo(@Valid PatientInfoRequest request, Long caretakerId);
 }

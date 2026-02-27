@@ -23,10 +23,9 @@ public class PatientInfoController {
         return new ResponseEntity<>("Info has been created.", HttpStatus.CREATED);
     }
 
-
-    @DeleteMapping("/{caretakerId}")
-    public ResponseEntity<String> deleteInfo(@Valid @RequestBody DeleteInfoReq request, @PathVariable Long caretakerId){
-        patientInfoService.deleteInfo(request, caretakerId);
-        return new ResponseEntity<>("Info has been deleted.", HttpStatus.OK);
+    @PutMapping("/{caretakerId}")
+    public ResponseEntity<String> updateInfo(@Valid @RequestBody PatientInfoRequest request, @PathVariable Long caretakerId){
+        patientInfoService.updateInfo(request, caretakerId);
+        return new ResponseEntity<>("Info has been updated.", HttpStatus.OK);
     }
 }

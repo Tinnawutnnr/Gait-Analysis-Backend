@@ -46,7 +46,21 @@ public class PatientInfoServiceImpl implements PatientInfoService {
     }
 
     @Override
-    public void deleteInfo(DeleteInfoReq request, Long caretakerId) {
+    public void updateInfo(PatientInfoRequest request, Long caretakerId) {
+        boolean isAuthorized = userRepository.isPatientAssignedToCaretaker(request.getUserId(), caretakerId);
 
+        if (!isAuthorized) {
+            throw new IllegalArgumentException("Access Denied.");
+        }
+
+        PatientInfo existingInfo = patientInfoRepo.findPatientInfoByUser_Id(request.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found."));
+
+        existingInfo.setAge(request.getAge());
+        existingInfo.setHeight(request.getHeight());
+        existingInfo.setWeight(request.getWeight());
+
+        patientInfoRepo.save(existingInfo);
     }
+
 }
