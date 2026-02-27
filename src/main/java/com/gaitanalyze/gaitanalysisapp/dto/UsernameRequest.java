@@ -1,6 +1,9 @@
 package com.gaitanalyze.gaitanalysisapp.dto;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class UsernameRequest {
+    @NotBlank(message = "Username is required.")
     private String username;
 
     public String getUsername() {
